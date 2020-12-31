@@ -3,7 +3,9 @@ package com.orenan.bombsFactory;
 //Polymorphism of class bomb.
 public class BlastBomb implements Bomb {
     @Override
-    public void draw() {
-        System.out.println("Blast Bomb");
+    public String draw() {
+        String bombType = "Blast Bomb";
+        System.out.println(bombType);
+        return bombType;
     }
 }

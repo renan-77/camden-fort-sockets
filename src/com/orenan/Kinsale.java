@@ -15,15 +15,16 @@ import java.util.Scanner;
 public class Kinsale {
 
     //Creating empty list of ships.
-    LinkedList<Ship> ships = new LinkedList<Ship>();
+    LinkedList<String> ships = new LinkedList<String>();
 
+    //Getting instance of ShipFactory.
     ShipFactory shipFactory =  ShipFactory.getInstance();
 
     //Creating list from produceShips method.
-    LinkedList<Ship> shipsList = produceShips();
+    LinkedList<String> shipsList = produceShips();
 
     //Creating bombsList.
-    LinkedList<Bomb> bombsList = new LinkedList<Bomb>();
+    LinkedList<String> bombsList = new LinkedList<String>();
 
     public Kinsale() throws InterruptedException {
     }
@@ -36,7 +37,7 @@ public class Kinsale {
     }
 
     //Method that produces a linked list of random size (limit is 10) of random ships.
-    public LinkedList<Ship> produceShips() throws InterruptedException{
+    public LinkedList<String> produceShips() throws InterruptedException{
         //Getting limit of ships that will be seen at the city.
         int capacity = getRandom(10);
 
@@ -58,7 +59,7 @@ public class Kinsale {
                 ship.draw();
 
                 //Adding ship to the list.
-                ships.add(ship);
+                ships.add(ship.draw());
             }
         }
 
@@ -89,7 +90,7 @@ public class Kinsale {
         ObjectInputStream ois = new ObjectInputStream(fis);
 
         //Getting bombs sent by server.
-        bombsList = (LinkedList<Bomb>) ois.readObject();
+        bombsList = (LinkedList<String>) ois.readObject();
         ois.close();
         fis.close();
 

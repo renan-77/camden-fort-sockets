@@ -8,13 +8,23 @@ import com.orenan.bombsFactory.BombFactory;
 import com.orenan.shipsFactory.Ship;
 
 import java.io.*;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.text.*;
 import java.util.*;
 import java.net.*;
 
 // Server class
-public class Blarney {
+public class Blarney extends Youghal {
     public static void main(String[] args) throws IOException {
+
+//        Youghal youghal = new Youghal();
+//
+//        CreateShip Stub = (CreateShip) UnicastRemoteObject.exportObject(youghal, 0);
+//
+//        Registry registry = LocateRegistry.getRegistry();
+
         // server is listening on port 5056
         ServerSocket ss = new ServerSocket(5056);
 
@@ -69,10 +79,10 @@ class ClientHandler extends Thread {
     ObjectOutputStream outBombsList = new ObjectOutputStream(fos);
 
     //Creating shipsList.
-    LinkedList<Ship> shipsList = new LinkedList<Ship>();
+    LinkedList<String> shipsList = new LinkedList<String>();
 
     //Creating bombsList.
-    LinkedList<Bomb> bombsList = new LinkedList<Bomb>();
+    LinkedList<String> bombsList = new LinkedList<String>();
 
     //Getting instance of the BombFactory.
     BombFactory bombFactory = BombFactory.getInstance();
@@ -86,13 +96,14 @@ class ClientHandler extends Thread {
 
     @Override
     public void run() {
+        System.out.println("Server is now running (Blarney)");
         String received;
         String toreturn;
         while (true)
         {
             try {
 
-                shipsList = (LinkedList<Ship>) ois.readObject();
+                shipsList = (LinkedList<String>) ois.readObject();
                 ois.close();
                 fis.close();
 
@@ -103,9 +114,11 @@ class ClientHandler extends Thread {
                         "\n Type Exit to terminate connection.");
 
                 for(int i = 0; i < shipsList.size(); i++){
-                    String currentShip = shipsList.get(i).draw();
+                    String currentShip = shipsList.get(i);
 
-                    bombsList.add(bombFactory.getBomb(currentShip));
+                    System.out.println(currentShip);
+
+                    bombsList.add(bombFactory.getBomb(currentShip).draw());
 
                     System.out.println(currentShip);
                 }
