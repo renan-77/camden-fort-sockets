@@ -70,10 +70,6 @@ class ClientHandler extends Thread {
     final DataOutputStream dos;
     final Socket s;
 
-    //Creating deserialization objects.
-    FileInputStream fis = new FileInputStream("shipsList.txt");
-    ObjectInputStream ois = new ObjectInputStream(fis);
-
     //Creating FileOutPut Stream to send object to server.
     FileOutputStream fos = new FileOutputStream("bombsList.txt", false);
 
@@ -103,6 +99,9 @@ class ClientHandler extends Thread {
         while (true)
         {
             try {
+                //Creating deserialization objects.
+                FileInputStream fis = new FileInputStream("shipsList.txt");
+                ObjectInputStream ois = new ObjectInputStream(fis);
 
                 //Creating shipList based on input from client
                 shipsList = (LinkedList<String>) ois.readObject();
@@ -110,13 +109,10 @@ class ClientHandler extends Thread {
                 fis.close();
 
                 File f = new File("shipsList.txt");
+
                 f.delete();
 
                 System.out.println(shipsList);
-
-                // Ask user what he wants
-                dos.writeUTF("We got your list with the following ships: " + shipsList +
-                        "\n Type Exit to terminate connection.");
 
                 //Declaring bombs based on ship.
                 for(int i = 0; i < shipsList.size(); i++){

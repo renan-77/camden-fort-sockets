@@ -33,7 +33,7 @@ public class Kinsale {
     int getRandom(int limit){
         Random rand = new Random();
         int upperBound = limit;
-        return rand.nextInt(upperBound) + 1;
+        return  rand.nextInt(upperBound) + 1;
     }
 
     //Method that produces a linked list of random size (limit is 10) of random ships.
@@ -98,21 +98,13 @@ public class Kinsale {
         System.out.println("My bombs: " + bombsList);
 
         //Assigning ship with bomb and telling it was destroyed.
-        //Handling if there is only 1 ship.
-        if(shipsList.size() <= 1){
-            System.out.println("Destroying ship number: 1");
-            System.out.println("Ship " + shipsList.get(0) + " was destroyed by " + bombsList.get(0));
-            shipsList.pop();
-            bombsList.pop();
-        }else{
-            for(int i = 0; i < (shipsList.size()); i++){
-                System.out.println("Destroying ship number: " + (i+2));
+        for(int i = 0; i < (shipsList.size()); i++){
+            System.out.println("Destroying ship number: " + (i+1));
 
-                System.out.println("Ship " + shipsList.get(i) + " was destroyed by " + bombsList.get(i));
-                shipsList.pop();
-                bombsList.pop();
-            }
+            System.out.println("Ship " + shipsList.get(i) + " was destroyed by " + bombsList.get(i));
         }
+        shipsList.clear();
+        bombsList.clear();
         return true;
     }
 
