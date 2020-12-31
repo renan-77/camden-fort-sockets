@@ -68,7 +68,7 @@ public class Kinsale {
 
     public void sendShips() throws IOException, InterruptedException{
         //Creating FileOutPut Stream to send object to server.
-        FileOutputStream fos = new FileOutputStream("shipsList");
+        FileOutputStream fos = new FileOutputStream("shipsList.txt",false);
 
         //Creating ObjectOutputStream to send LinkedList as a serialized object to server.
         ObjectOutputStream outShipsList = new ObjectOutputStream(fos);
@@ -78,15 +78,16 @@ public class Kinsale {
         //Sending serialized object to server.
         outShipsList.writeObject(shipsList);
         outShipsList.flush();
+        fos.flush();
 
         //Closing connections.
         outShipsList.close();
         fos.close();
     }
 
-    public void destroyShips() throws IOException, ClassNotFoundException, InterruptedException {
+    public boolean destroyShips() throws IOException, ClassNotFoundException, InterruptedException {
         //Creating deserialization objects.
-        FileInputStream fis = new FileInputStream("bombsList");
+        FileInputStream fis = new FileInputStream("bombsList.txt");
         ObjectInputStream ois = new ObjectInputStream(fis);
 
         //Getting bombs sent by server.
@@ -99,18 +100,25 @@ public class Kinsale {
         //Assigning ship with bomb and telling it was destroyed.
         //Handling if there is only 1 ship.
         if(shipsList.size() <= 1){
-            System.out.println("Ship " + shipsList.get(0) + "was destroyed by " + bombsList.get(0));
+            System.out.println("Destroying ship number: 1");
+            System.out.println("Ship " + shipsList.get(0) + " was destroyed by " + bombsList.get(0));
+            shipsList.pop();
+            bombsList.pop();
         }else{
-            for(int i = 0; i < (shipsList.size() - 1); i++){
-                System.out.println(i);
+            for(int i = 0; i < (shipsList.size()); i++){
+                System.out.println("Destroying ship number: " + (i+2));
 
-                System.out.println("Ship " + shipsList.get(i) + "was destroyed by " + bombsList.get(i));
+                System.out.println("Ship " + shipsList.get(i) + " was destroyed by " + bombsList.get(i));
+                shipsList.pop();
+                bombsList.pop();
             }
         }
+        return true;
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
         try {
+            String tosend = "";
             Scanner scn = new Scanner(System.in);
 
             // getting localhost ip
@@ -126,21 +134,31 @@ public class Kinsale {
             DataInputStream dis = new DataInputStream(s.getInputStream());
             DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
-            //Creating ships from class.
-            kinsale.sendShips();
-
-            //Receiving bombs from server and destroying ships.
-//            kinsale.destroyShips();
-
             // the following loop performs the exchange of
             // information between client and client handler
             while (true) {
-                System.out.println("Enter create to create ships");
-                String tosend = scn.nextLine();
-                dos.writeUTF(tosend);
+                File f = new File("bombsList.txt");
+
+                //Creating ships from class.
+                kinsale.sendShips();
+
+                if(f.exists()){
+                    //Receiving bombs from server and destroying ships.
+                    boolean areShipsDestroyed = kinsale.destroyShips();
+                    System.out.println("Deleting File");
+                    f.delete();
+                    if(areShipsDestroyed){
+                        dos.writeUTF(tosend);
+                        break;
+                    }
+                }
+
+                System.out.println("Bombs received by Blarney \n" +
+                        "Enter destroy to destroy ships");
+                 tosend = scn.nextLine();
 
 
-                if(tosend.equals("create")){
+                if(tosend.equals("destroy")){
 
                 }
 

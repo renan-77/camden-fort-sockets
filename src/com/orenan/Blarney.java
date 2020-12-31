@@ -25,6 +25,8 @@ public class Blarney extends Youghal {
 //
 //        Registry registry = LocateRegistry.getRegistry();
 
+        System.out.println("Server is now running (Blarney)");
+
         // server is listening on port 5056
         ServerSocket ss = new ServerSocket(5056);
 
@@ -69,11 +71,11 @@ class ClientHandler extends Thread {
     final Socket s;
 
     //Creating deserialization objects.
-    FileInputStream fis = new FileInputStream("shipsList");
+    FileInputStream fis = new FileInputStream("shipsList.txt");
     ObjectInputStream ois = new ObjectInputStream(fis);
 
     //Creating FileOutPut Stream to send object to server.
-    FileOutputStream fos = new FileOutputStream("bombsList");
+    FileOutputStream fos = new FileOutputStream("bombsList.txt", false);
 
     //Creating ObjectOutputStream to send LinkedList as a serialized object to server.
     ObjectOutputStream outBombsList = new ObjectOutputStream(fos);
@@ -96,16 +98,19 @@ class ClientHandler extends Thread {
 
     @Override
     public void run() {
-        System.out.println("Server is now running (Blarney)");
         String received;
         String toreturn;
         while (true)
         {
             try {
 
+                //Creating shipList based on input from client
                 shipsList = (LinkedList<String>) ois.readObject();
                 ois.close();
                 fis.close();
+
+                File f = new File("shipsList.txt");
+                f.delete();
 
                 System.out.println(shipsList);
 
@@ -113,18 +118,20 @@ class ClientHandler extends Thread {
                 dos.writeUTF("We got your list with the following ships: " + shipsList +
                         "\n Type Exit to terminate connection.");
 
+                //Declaring bombs based on ship.
                 for(int i = 0; i < shipsList.size(); i++){
                     String currentShip = shipsList.get(i);
 
                     System.out.println(currentShip);
 
-                    bombsList.add(bombFactory.getBomb(currentShip).draw());
+                    Bomb currentBomb = bombFactory.getBomb(currentShip);
 
-                    System.out.println(currentShip);
+                    bombsList.add(currentBomb.draw());
                 }
 
                 System.out.println(bombsList);
 
+                //Sending bombs to client
                 if(bombsList.size() == shipsList.size()){
                     outBombsList.writeObject(bombsList);
                     //Closing connections.
@@ -136,8 +143,14 @@ class ClientHandler extends Thread {
                 // receive the answer from client
                 received = dis.readUTF();
 
-                if(received.equals("create")){
-                    System.out.println("Created");
+                if(received.equals("destroy")){
+                    f = new File("bombsList.txt");
+                    f.delete();
+                    System.out.println("Client " + this.s + " sends destroy...");
+                    System.out.println("Closing this connection.");
+                    this.s.close();
+                    System.out.println("Connection closed");
+                    break;
                 }
 
                 if(received.equals("Exit")) {
@@ -148,38 +161,9 @@ class ClientHandler extends Thread {
                     break;
                 }
 
-                // creating Date object
-                Date date = new Date();
-
-                // write on output stream based on the
-                // answer from the client
-//                switch (received) {
-//
-//                    case "create" :
-//
-//                        break;
-//
-//                    case "Time" :
-//                        toreturn = fortime.format(date);
-//                        dos.writeUTF(toreturn);
-//                        break;
-//
-//                    default:
-//                        dos.writeUTF("Invalid input");
-//                        break;
-//                }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        }
-
-        try {
-            // closing resources
-            this.dis.close();
-            this.dos.close();
-
-        }catch(IOException e){
-            e.printStackTrace();
         }
     }
 }
